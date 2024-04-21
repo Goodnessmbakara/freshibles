@@ -1,0 +1,110 @@
+{% extends 'base_template.html' %}
+{% load static %}
+
+{% block title %}Freshibles - Cart{% endblock %}
+
+{% block content %}
+<!-- Cart Page Start -->
+<div class="container-fluid py-5">
+    <div class="container py-5">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Products</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Price</th>
+                        <th scope="col">Quantity</th>
+                        <th scope="col">Total</th>
+                        <th scope="col">Remove</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in cart_items %}
+                    <tr id="cart_item_{{ item.id }}">
+                        <td>
+                            <img src="{{ item.product.product_image.url }}" alt="{{ item.product.product_name }}" class="img-fluid rounded-circle" style="width: 80px; height: 80px;">
+                        </td>
+                        <td class="align-middle">{{ item.product.product_name }}</td>
+                        <td class="align-middle">${{ item.product.product_price }}</td>
+                        <td class="align-middle">
+                            <div class="input-group">
+                                <button class="btn btn-sm btn-outline-secondary" onclick="updateQuantity('{{ item.id }}', 'dec')">-</button>
+                                <input type="text" class="form-control text-center" value="{{ item.quantity }}" id="quantity_{{ item.id }}" readonly>
+                                <button class="btn btn-sm btn-outline-secondary" onclick="updateQuantity('{{ item.id }}', 'inc')">+</button>
+                            </div>
+                        </td>
+                        <td class="align-middle" id="total_{{ item.id }}">${{ item.get_total_item_price }}</td>
+                        <td class="align-middle">
+                            <button class="btn btn-danger" onclick="deleteCartItem({{ item.id }})">
+                                <i class="fa fa-times"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6">Your cart is empty.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if cart_items %}
+        <div class="d-flex justify-content-end mt-5">
+            <h4>Total: ${{ total_price }}</h4>
+        </div>
+        {% endif %}
+        <div class="d-flex justify-content-between align-items-center mt-4">
+            <button class="btn btn-primary">Proceed to Checkout</button>
+        </div>
+    </div>
+</div>
+<!-- Cart Page End -->
+
+<script>
+function deleteCartItem(itemId) {
+    fetch(`/cart/delete/${itemId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            document.getElementById('cart_item_' + itemId).remove();
+        } else {
+            alert('Failed to delete item: ' + data.message);
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function updateQuantity(itemId, action) {
+    let quantityInput = document.getElementById('quantity_' + itemId);
+    let currentQuantity = parseInt(quantityInput.value);
+    if (action === 'inc') currentQuantity += 1;
+    else if (action === 'dec' && currentQuantity > 1) currentQuantity -= 1;
+
+    fetch(`/cart/update/${itemId}/${action}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ quantity: currentQuantity })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            quantityInput.value = data.quantity;
+            document.getElementById('total_' + itemId).textContent = '$' + data.total_price.toFixed(2);
+        } else {
+            alert('Failed to update quantity: ' + data.message);
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+</script>
+{% endblock %}

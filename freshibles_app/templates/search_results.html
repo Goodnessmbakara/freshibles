@@ -1,0 +1,39 @@
+{% extends 'base_template.html' %}
+{% load static %}
+
+{% block title %}Freshibles - Search Results{% endblock %}
+
+{% block content %}
+
+
+<!-- Search Results Start -->
+<div class="container-fluid pt-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title px-5"><span class="px-2">Tasty Treats Awaiting You</span></h2>
+        </div>
+        <div class="row">
+            {% for product in products %}
+            <div class="col-lg-4 col-md-6 col-sm-12 pb-1">
+                <div class="product-card card border-0 bg-light mb-4">
+                    <div class="card-img-top">
+                        <img src="{{ product.product_image.url }}" alt="{{ product.product_name }}" class="img-fluid">
+                    </div>
+                    <div class="card-body text-center">
+                        <h4 class="card-title">{{ product.product_name }}</h4>
+                        <p class="text-muted">{{ product.product_description }}</p>
+                        <p class="text-primary font-weight-bold">${{ product.product_price }}</p>
+                        {% comment %} <a href="{% url 'product_detail' product.id %}" class="btn btn-primary">View Details</a> {% endcomment %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <p class="text-center">No products found matching your criteria.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<!-- Search Results End -->
+{% endblock %}

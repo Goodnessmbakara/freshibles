@@ -1,0 +1,132 @@
+{% extends 'base_template.html' %}
+{% load static %}
+
+{% block title %}Freshibles - Home{% endblock %}
+
+{% block content %}
+<!-- Hero Start -->
+<div class="container-fluid py-5 mb-5 hero-header" style="background: url('{% static 'img/hero-background.jpg' %}') no-repeat center center; background-size: cover;">
+    <div class="container py-5 text-white text-shadow">
+        <div class="row g-5 align-items-center">
+            <div class="col-md-12 col-lg-7">
+                <h4 class="mb-3 text-secondary">100% Organic Foods</h4>
+                <h1 class="mb-5 display-3">Organic Veggies & Fruits Foods</h1>
+                <form action="{% url 'search_results' %}" method="get" class="position-relative mx-auto" style="max-width: 500px;">
+                    <input class="form-control border-2 border-secondary py-3 px-4 rounded-pill" type="text" name="query" placeholder="Search" required>
+                    <button type="submit" class="btn btn-primary border-2 border-secondary py-3 px-4 position-absolute rounded-pill text-white" style="right: 0; top: 0;">
+                        Search Now
+                    </button>
+                </form>
+            </div>
+            <div class="col-md-12 col-lg-5">
+                <div id="carouselId" class="carousel slide position-relative" data-bs-ride="carousel">
+                    <div class="carousel-inner" role="listbox">
+                        <div class="carousel-item active rounded">
+                            <img src="{% static 'img/hero-img-1.png' %}" class="img-fluid w-100 h-100 bg-secondary rounded" alt="First slide">
+                            <div class="carousel-caption d-none d-md-block">
+                                <a href="#" class="btn btn-lg px-4 py-2 text-white rounded">Discover Fruits</a>
+                            </div>
+                        </div>
+                        <div class="carousel-item rounded">
+                            <img src="{% static 'img/hero-img-2.jpg' %}" class="img-fluid w-100 h-100 rounded" alt="Second slide">
+                            <div class="carousel-caption d-none d-md-block">
+                                <a href="#" class="btn btn-lg px-4 py-2 text-white rounded">Explore Vegetables</a>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselId" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carouselId" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Hero End -->
+
+<!-- Features Section Start -->
+<div class="container-fluid features py-5 bg-light">
+    <div class="container py-5">
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="features-item text-center rounded p-4">
+                    <div class="features-icon btn-square rounded-circle bg-primary mb-5 mx-auto">
+                        <i class="fas fa-truck fa-3x text-white"></i>
+                    </div>
+                    <div class="features-content">
+                        <h5>Free Shipping</h5>
+                        <p class="mb-0">Free on order over $300</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="features-item text-center rounded p-4">
+                    <div class="features-icon btn-square rounded-circle bg-success mb-5 mx-auto">
+                        <i class="fas fa-lock fa-3x text-white"></i>
+                    </div>
+                    <div class="features-content">
+                        <h5>Secure Payment</h5>
+                        <p class="mb-0">100% secure payment</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="features-item text-center rounded p-4">
+                    <div class="features-icon btn-square rounded-circle bg-danger mb-5 mx-auto">
+                        <i class="fas fa-sync-alt fa-3x text-white"></i>
+                    </div>
+                    <div class="features-content">
+                        <h5>30 Day Return</h5>
+                        <p class="mb-0">30 day money back guarantee</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="features-item text-center rounded p-4">
+                    <div class="features-icon btn-square rounded-circle bg-info mb-5 mx-auto">
+                        <i class="fas fa-headset fa-3x text-white"></i>
+                    </div>
+                    <div class="features-content">
+                        <h5>24/7 Support</h5>
+                        <p class="mb-0">Support every time fast</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Features Section End -->
+
+<!-- Dynamically add sections for Dairy, Vegetables, Fruits, Bread, Meat, etc., using a similar format as above -->
+{% for category, products in products_by_category.items %}
+<div class="container-fluid py-5">
+    <div class="container py-5">
+        <h1 class="mb-0">{{ category }}</h1>
+        <div class="row g-4">
+            {% for product in products %}
+            <div class="col-lg-3 col-md-6">
+                <div class="product-item text-center rounded bg-light p-4">
+                    <div class="product-img">
+                        <img src="{{ product.product_image.url }}" class="img-fluid w-100 rounded-top" alt="{{ product.product_name }}">
+                    </div>
+                    <div class="product-content p-3">
+                        <h5>{{ product.product_name }}</h5>
+                        <p>{{ product.product_description }}</p>
+                        <h4>${{ product.product_price }}</h4>
+                        <a href="{% url 'add_to_cart' product.id %}" class="btn btn-primary">Add to Cart</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endfor %}
+<!-- Additional categories and sections end -->
+
+{% endblock %}
