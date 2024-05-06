@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, get_object_or_404
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
@@ -13,8 +14,6 @@ import random
 from decimal import Decimal
 
 def home(request):
-    if not(request.user.is_authenticated):
-        return redirect('register')
     categories = Product.CATEGORY_CHOICES
     products_by_category = {}
 
@@ -48,6 +47,9 @@ def subscribe_newsletter(request):
     return redirect('home')
 
 def add_to_cart(request, product_id):
+    if not(request.user.is_authenticated):
+        messages.success(request=request,message="You need to sign in first")
+        return redirect('login')
     product = get_object_or_404(Product, id=product_id)
     cart, created = Cart.objects.get_or_create(user=request.user, defaults={'user': request.user})
 
@@ -118,7 +120,11 @@ def quick_password_reset(request):
         form = QuickPasswordResetForm()
     return render(request, 'password_reset.html', {'form': form})
 
+
 def cart(request):
+    if not(request.user.is_authenticated):
+        messages.success(request=request,message="You need to sign in first")
+        return redirect('login')
     try:
         cart = Cart.objects.get(user=request.user)
         items = cart.items.all()
@@ -156,7 +162,11 @@ def product_search(request):
 
     return render(request, 'search_results.html', {'products': products})
 
+
 def update_cart_item(request, item_id, action):
+    if not(request.user.is_authenticated):
+        messages.success(request=request,message="You need to sign in first")
+        return redirect('login')
     if request.method == 'POST':
         cart_item = get_object_or_404(CartItem, id=item_id)
         if action == 'inc':
@@ -170,7 +180,11 @@ def update_cart_item(request, item_id, action):
             'total_price': cart_item.get_total_item_price()
         })
 
+
 def delete_cart_item(request, item_id):
+    if not(request.user.is_authenticated):
+        messages.success(request=request,message="You need to sign in first")
+        return redirect('login')
     if request.method == 'POST':
         cart_item = get_object_or_404(CartItem, id=item_id)
         cart_item.delete()
@@ -181,7 +195,7 @@ def submit_message(request):
         name = request.POST.get('name')
         email = request.POST.get('email')
         message_body = request.POST.get('message_body')
-    
+
         # Save the message to the database
         Message.objects.create(name=name, email=email, message_body=message_body)
         messages.success(request, f'Thank you for your message. {name} ! We will get back to you soon.')
